@@ -1,0 +1,21 @@
+{
+  "name": "Tree Data Collector",
+  "short_name": "TreeData",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f4f4",
+  "theme_color": "#007bff",
+  "description": "A simple app to collect tree data.",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
