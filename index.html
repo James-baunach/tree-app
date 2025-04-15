@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Data Collector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Tree Data Collector</h1>
+
+    <div class="input-section">
+        <!-- === REORDERED START === -->
+
+        <!-- 1. Species -->
+        <div class="input-group">
+            <label for="speciesSelect">Species:</label>
+            <select id="speciesSelect">
+                <option value="White Oak">White Oak</option>
+                <option value="Red Oak">Red Oak</option>
+                <option value="Yellow-poplar">Yellow-poplar</option>
+                <option value="Hickory">Hickory</option>
+                <option value="Maple">Maple</option>
+                <option value="Black Walnut">Black Walnut</option>
+                <option value="Beech">Beech</option>
+                <option value="Gum">Gum</option>
+                <option value="Eastern redcedar">Eastern redcedar</option>
+                <option value="MISC">MISC</option>
+                <option value="Other 1">Other 1</option>
+                <option value="Other 2">Other 2</option>
+                <option value="Other 3">Other 3</option>
+            </select>
+        </div>
+
+        <!-- 2. DBH -->
+        <div class="input-group">
+            <label for="dbhSelect">DBH:</label>
+            <select id="dbhSelect"></select> <!-- Options added by JS -->
+        </div>
+
+        <!-- 3. Logs -->
+        <div class="input-group">
+            <label for="logsSelect">Logs:</label>
+            <select id="logsSelect"></select> <!-- Options added by JS -->
+        </div>
+
+        <!-- 4. Plot Number -->
+        <div class="input-group">
+            <label for="plotNumberSelect">Plot Number:</label>
+            <select id="plotNumberSelect"></select> <!-- Options added by JS -->
+        </div>
+
+        <!-- === REORDERED END === -->
+    </div>
+
+    <div class="button-section">
+        <button id="submitBtn">Submit Entry</button>
+        <button id="saveCsvBtn" disabled>Save CSV File</button>
+    </div>
+
+    <div class="output-section">
+        <h2>Recent Entries (<span id="entryCount">0</span>)</h2>
+         <button id="deleteBtn" class="delete-button" disabled>Delete Selected</button>
+        <ul id="entriesList">
+            <li id="noEntriesMsg">No data submitted yet.</li>
+        </ul>
+    </div>
+
+    <!-- Link to JavaScript file -->
+    <script src="script.js" defer></script>
+</body>
+</html>
