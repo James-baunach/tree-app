@@ -1,3 +1,30 @@
+// --- START OF FILE script.js ---
+
+// --- Service Worker Registration ---
+// This block registers the service worker script ('service-worker.js')
+// It should be placed in the same directory as this script and index.html
+if ('serviceWorker' in navigator) {
+  // Wait until the page is fully loaded before registering the service worker
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(registration => {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      })
+      .catch(err => {
+        // Registration failed
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  });
+} else {
+    // Service workers are not supported by the browser
+    console.log('Service Workers not supported by this browser.');
+}
+// --- End of Service Worker Registration ---
+
+
+// --- Application Logic (Existing Code) ---
+// Wait for the DOM to be fully loaded before running app logic
 document.addEventListener('DOMContentLoaded', () => {
     // --- Get DOM Elements ---
     const plotNumberSelect = document.getElementById('plotNumberSelect'); // Added
@@ -12,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const noEntriesMsg = document.getElementById('noEntriesMsg');
 
     // --- Data Storage ---
+    // NOTE: This data is still only in memory. For true offline data persistence
+    // (saving data even after closing the app), you'd need localStorage or IndexedDB.
     let collectedData = []; // Array to hold submitted entry objects
 
     // --- Populate Dropdowns ---
@@ -49,20 +78,43 @@ document.addEventListener('DOMContentLoaded', () => {
         entryCountSpan.textContent = collectedData.length;
 
         if (collectedData.length === 0) {
-            entriesList.appendChild(noEntriesMsg);
+            // Find the placeholder 'li' and ensure it's displayed correctly
+            let placeholder = document.getElementById('noEntriesMsg');
+            if (!placeholder) {
+                placeholder = document.createElement('li');
+                placeholder.id = 'noEntriesMsg';
+                placeholder.textContent = 'No data submitted yet.';
+                 // Add necessary styles if needed, like italic
+                 placeholder.style.fontStyle = 'italic';
+                 placeholder.style.color = '#6c757d';
+                 placeholder.style.textAlign = 'center';
+                 placeholder.style.border = 'none';
+                 placeholder.style.backgroundColor = 'transparent';
+            }
+            // Ensure the placeholder is the only thing in the list
+            entriesList.innerHTML = ''; // Clear again just in case
+            entriesList.appendChild(placeholder);
+
             saveCsvBtn.disabled = true;
             deleteBtn.disabled = true;
         } else {
+             // Ensure the placeholder is removed if present
+             const placeholder = document.getElementById('noEntriesMsg');
+             if (placeholder) {
+                 placeholder.remove();
+             }
+
+            // Display entries in reverse chronological order (newest first)
             for (let i = collectedData.length - 1; i >= 0; i--) {
                 const entry = collectedData[i];
                 const listItem = document.createElement('li');
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.value = entry.id;
-                checkbox.setAttribute('data-id', entry.id);
+                checkbox.value = entry.id; // Use ID for potential deletion tracking
+                checkbox.setAttribute('data-id', entry.id); // Store id in data attribute
 
-                // --- MODIFICATION: Added Plot Number to display text ---
+                // Display entry details
                 const textNode = document.createTextNode(` Plot: ${entry.plotNumber}, DBH: ${entry.dbh}, Species: ${entry.species}, Logs: ${entry.logs}`);
 
                 listItem.appendChild(checkbox);
@@ -70,9 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 entriesList.appendChild(listItem);
             }
             saveCsvBtn.disabled = false;
+            // Disable delete button initially until a checkbox is checked
             deleteBtn.disabled = !isAnyCheckboxChecked();
         }
     }
+
 
     // --- Check if any checkbox is checked ---
     function isAnyCheckboxChecked() {
@@ -88,16 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Submit Button Handler ---
     submitBtn.addEventListener('click', () => {
         const newEntry = {
-            id: Date.now(),
-            plotNumber: plotNumberSelect.value, // Added plot number
+            id: Date.now(), // Use timestamp as a simple unique ID
+            plotNumber: plotNumberSelect.value,
             dbh: dbhSelect.value,
             species: speciesSelect.value,
             logs: logsSelect.value
         };
 
         collectedData.push(newEntry);
-        renderEntries();
+        renderEntries(); // Update the list display
 
+        // Optional: Log to console for debugging
         console.log("Entry Added:", newEntry);
         console.log("Collected Data:", collectedData);
     });
@@ -109,37 +164,41 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- MODIFICATION: Added Plot Number to CSV Header ---
+        // Define CSV header
         let csvContent = "PlotNumber,DBH,Species,Logs\n"; // Updated CSV Header
 
+        // Add each data entry as a row
         collectedData.forEach(entry => {
-            // --- MODIFICATION: Added Plot Number to CSV row ---
             csvContent += `${entry.plotNumber},${entry.dbh},${entry.species},${entry.logs}\n`;
         });
 
+        // Create a Blob and download link
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
 
+        // Generate timestamp for filename
         const timestamp = new Date().toISOString().slice(0, 19).replace(/[-T:]/g, "");
         link.setAttribute("href", url);
         link.setAttribute("download", `TreeData_${timestamp}.csv`);
         link.style.visibility = 'hidden';
 
+        // Trigger download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url); // Clean up URL object
     });
 
     // --- Delete Button Handler ---
     deleteBtn.addEventListener('click', () => {
         const checkboxes = entriesList.querySelectorAll('input[type="checkbox"]:checked');
-        const idsToDelete = new Set();
+        const idsToDelete = new Set(); // Use a Set for efficient lookup
 
         checkboxes.forEach(cb => {
+            // Get the ID stored in the data-id attribute
             const id = parseInt(cb.getAttribute('data-id'), 10);
-            if (!isNaN(id)) {
+            if (!isNaN(id)) { // Ensure it's a valid number
                  idsToDelete.add(id);
             }
         });
@@ -149,21 +208,30 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Filter out the entries whose IDs are in the Set
         collectedData = collectedData.filter(entry => !idsToDelete.has(entry.id));
-        renderEntries();
+        renderEntries(); // Update the list display
+
         console.log("Entries deleted. Remaining data:", collectedData);
     });
 
      // --- Enable/Disable Delete Button Based on Checkbox Clicks ---
+     // Use event delegation on the list itself for efficiency
      entriesList.addEventListener('change', (event) => {
+         // Check if the changed element was a checkbox
          if (event.target.type === 'checkbox') {
+             // Enable delete button only if at least one checkbox is checked
              deleteBtn.disabled = !isAnyCheckboxChecked();
          }
      });
 
     // --- Initial Setup ---
-    populatePlotNumberOptions(); // Added call
+    // Populate dropdowns when the DOM is ready
+    populatePlotNumberOptions();
     populateDbhOptions();
     populateLogsOptions();
-    renderEntries(); // Initial render
+    // Render the initial state of the entries list (likely empty)
+    renderEntries();
 });
+
+// --- END OF FILE script.js ---
