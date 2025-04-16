@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateLogsOptions() {
-        const logValues = ["0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "Cull"];
+        const logValues = ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "Cull"];
         logValues.forEach(value => {
             const option = document.createElement('option');
             option.value = value;
