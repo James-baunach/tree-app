@@ -62,15 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function populateLogsOptions() {
+      function populateLogsOptions() {
         const logValues = ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "Cull"];
+        console.log("Populating logs options..."); // Added log
         logValues.forEach(value => {
+            console.log("Processing log value:", value); // Added log
             const option = document.createElement('option');
             option.value = value;
             option.textContent = value;
             logsSelect.appendChild(option);
         });
-    }
+         console.log("Finished populating logs options."); // Added log
+      }
 
     // --- Render Entries List ---
     function renderEntries() {
