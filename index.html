@@ -24,13 +24,9 @@
                 <option value="Hickory">Hickory</option>
                 <option value="Maple">Maple</option>
                 <option value="Black Walnut">Black Walnut</option>
-                <option value="Ash">Ash</option>
-                <option value="Elm">Elm</option>
-                <option value="Eastern redcedar">Eastern redcedar</option>
                 <option value="Beech">Beech</option>
-                <option value="Black Cherry">Black Cherry</option>
                 <option value="Gum">Gum</option>
-                <option value="Sycamore">Sycamore</option>
+                <option value="Eastern redcedar">Eastern redcedar</option>
                 <option value="MISC">MISC</option>
                 <option value="Other 1">Other 1</option>
                 <option value="Other 2">Other 2</option>
@@ -57,6 +53,13 @@
         </div>
 
         <!-- === REORDERED END === -->
+
+        <!-- 5. Cut Checkbox (NEW) -->
+        <div class="input-group cut-checkbox-group">
+            <input type="checkbox" id="cutCheckbox" name="cutStatus">
+            <label for="cutCheckbox">Cut</label>
+        </div>
+        <!-- === END OF NEW CHECKBOX === -->
     </div>
 
     <div class="button-section">
@@ -66,11 +69,9 @@
 
     <div class="output-section">
         <h2>Recent Entries (<span id="entryCount">0</span>)</h2>
-        <!-- === BUTTON MOVED HERE === -->
         <div class="delete-button-container">
             <button id="deleteBtn" class="delete-button" disabled>Delete Selected</button>
         </div>
-        <!-- === END OF MOVE === -->
         <ul id="entriesList">
             <li id="noEntriesMsg">No data submitted yet.</li>
         </ul>
