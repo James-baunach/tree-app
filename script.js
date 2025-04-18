@@ -1,36 +1,30 @@
 // --- START OF FILE script.js ---
 
 // --- Service Worker Registration ---
-// This block registers the service worker script ('service-worker.js')
-// It should be placed in the same directory as this script and index.html
 if ('serviceWorker' in navigator) {
-  // Wait until the page is fully loaded before registering the service worker
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js')
       .then(registration => {
-        // Registration was successful
         console.log('ServiceWorker registration successful with scope: ', registration.scope);
       })
       .catch(err => {
-        // Registration failed
         console.log('ServiceWorker registration failed: ', err);
       });
   });
 } else {
-    // Service workers are not supported by the browser
     console.log('Service Workers not supported by this browser.');
 }
 // --- End of Service Worker Registration ---
 
 
-// --- Application Logic (Existing Code) ---
-// Wait for the DOM to be fully loaded before running app logic
+// --- Application Logic ---
 document.addEventListener('DOMContentLoaded', () => {
     // --- Get DOM Elements ---
-    const plotNumberSelect = document.getElementById('plotNumberSelect'); // Added
+    const plotNumberSelect = document.getElementById('plotNumberSelect');
     const dbhSelect = document.getElementById('dbhSelect');
     const speciesSelect = document.getElementById('speciesSelect');
     const logsSelect = document.getElementById('logsSelect');
+    const cutCheckbox = document.getElementById('cutCheckbox');
     const submitBtn = document.getElementById('submitBtn');
     const saveCsvBtn = document.getElementById('saveCsvBtn');
     const deleteBtn = document.getElementById('deleteBtn');
@@ -39,12 +33,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const noEntriesMsg = document.getElementById('noEntriesMsg');
 
     // --- Data Storage ---
-    // NOTE: This data is still only in memory. For true offline data persistence
-    // (saving data even after closing the app), you'd need localStorage or IndexedDB.
     let collectedData = []; // Array to hold submitted entry objects
+    const STORAGE_KEY = 'treeDataTempSession'; // Key for localStorage
+
+    // --- Function to save current data to localStorage ---
+    function saveSessionData() {
+        try {
+            // Only save if there's actually data to prevent empty saves overwriting
+            if (collectedData.length > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(collectedData));
+                console.log('[Session] Data saved to localStorage.');
+            } else {
+                // If collectedData is empty, clear any lingering temp data
+                localStorage.removeItem(STORAGE_KEY);
+                console.log('[Session] Data empty, cleared localStorage.');
+            }
+        } catch (e) {
+            console.error('[Session] Error saving data to localStorage:', e);
+            // Handle potential storage full errors or other issues
+        }
+    }
+
+    // --- Function to load data from localStorage and prompt user ---
+    function loadAndPromptSessionData() {
+        try {
+            const savedDataJSON = localStorage.getItem(STORAGE_KEY);
+            if (savedDataJSON) {
+                const recoveredData = JSON.parse(savedDataJSON);
+                // Check if there's actually data in the recovered array
+                if (Array.isArray(recoveredData) && recoveredData.length > 0) {
+                    // Prompt the user
+                    if (confirm(`Recover ${recoveredData.length} entries from the last session?`)) {
+                        collectedData = recoveredData; // Restore the data
+                        console.log('[Session] Data recovered from localStorage.');
+                        // Optional: Clear storage after successful recovery if you don't
+                        // want to be prompted again on the *next* refresh without new changes.
+                        // localStorage.removeItem(STORAGE_KEY);
+                    } else {
+                        // User chose not to recover, clear the stored data
+                        localStorage.removeItem(STORAGE_KEY);
+                        console.log('[Session] User declined recovery. Cleared localStorage.');
+                    }
+                } else {
+                    // If storage contained empty array or invalid data, clear it
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+        } catch (e) {
+            console.error('[Session] Error loading or parsing data from localStorage:', e);
+            // Clear potentially corrupted data
+            localStorage.removeItem(STORAGE_KEY);
+        }
+        // Always render, either with recovered data or empty state
+        renderEntries();
+    }
 
     // --- Populate Dropdowns ---
-    function populatePlotNumberOptions() { // Added function
+    function populatePlotNumberOptions() {
         for (let i = 1; i <= 20; i++) {
             const option = document.createElement('option');
             option.value = i;
@@ -62,74 +107,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-      function populateLogsOptions() {
+    function populateLogsOptions() {
         const logValues = ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "Cull"];
-        console.log("Populating logs options..."); // Added log
         logValues.forEach(value => {
-            console.log("Processing log value:", value); // Added log
             const option = document.createElement('option');
             option.value = value;
             option.textContent = value;
             logsSelect.appendChild(option);
         });
-         console.log("Finished populating logs options."); // Added log
-      }
+    }
 
     // --- Render Entries List ---
     function renderEntries() {
-        entriesList.innerHTML = ''; // Clear current list
+        entriesList.innerHTML = '';
         entryCountSpan.textContent = collectedData.length;
 
         if (collectedData.length === 0) {
-            // Find the placeholder 'li' and ensure it's displayed correctly
             let placeholder = document.getElementById('noEntriesMsg');
             if (!placeholder) {
                 placeholder = document.createElement('li');
                 placeholder.id = 'noEntriesMsg';
                 placeholder.textContent = 'No data submitted yet.';
-                 // Add necessary styles if needed, like italic
                  placeholder.style.fontStyle = 'italic';
                  placeholder.style.color = '#6c757d';
                  placeholder.style.textAlign = 'center';
                  placeholder.style.border = 'none';
                  placeholder.style.backgroundColor = 'transparent';
             }
-            // Ensure the placeholder is the only thing in the list
-            entriesList.innerHTML = ''; // Clear again just in case
+            entriesList.innerHTML = '';
             entriesList.appendChild(placeholder);
-
             saveCsvBtn.disabled = true;
             deleteBtn.disabled = true;
         } else {
-             // Ensure the placeholder is removed if present
              const placeholder = document.getElementById('noEntriesMsg');
              if (placeholder) {
                  placeholder.remove();
              }
-
-            // Display entries in reverse chronological order (newest first)
             for (let i = collectedData.length - 1; i >= 0; i--) {
                 const entry = collectedData[i];
                 const listItem = document.createElement('li');
-
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.value = entry.id; // Use ID for potential deletion tracking
-                checkbox.setAttribute('data-id', entry.id); // Store id in data attribute
+                checkbox.value = entry.id;
+                checkbox.setAttribute('data-id', entry.id);
 
-                // Display entry details
-                const textNode = document.createTextNode(` Plot: ${entry.plotNumber}, DBH: ${entry.dbh}, Species: ${entry.species}, Logs: ${entry.logs}`);
+                const textNode = document.createTextNode(
+                    ` Plot: ${entry.plotNumber}, DBH: ${entry.dbh}, Species: ${entry.species}, Logs: ${entry.logs}, Cut: ${entry.cutStatus}`
+                );
 
                 listItem.appendChild(checkbox);
                 listItem.appendChild(textNode);
                 entriesList.appendChild(listItem);
             }
             saveCsvBtn.disabled = false;
-            // Disable delete button initially until a checkbox is checked
             deleteBtn.disabled = !isAnyCheckboxChecked();
         }
     }
-
 
     // --- Check if any checkbox is checked ---
     function isAnyCheckboxChecked() {
@@ -145,19 +178,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Submit Button Handler ---
     submitBtn.addEventListener('click', () => {
         const newEntry = {
-            id: Date.now(), // Use timestamp as a simple unique ID
+            id: Date.now(),
             plotNumber: plotNumberSelect.value,
             dbh: dbhSelect.value,
             species: speciesSelect.value,
-            logs: logsSelect.value
+            logs: logsSelect.value,
+            cutStatus: cutCheckbox.checked ? 'Yes' : 'No'
         };
 
         collectedData.push(newEntry);
-        renderEntries(); // Update the list display
+        renderEntries();
+        saveSessionData(); // <-- Save data after adding
 
-        // Optional: Log to console for debugging
+        cutCheckbox.checked = false; // Optional: Reset checkbox
+
         console.log("Entry Added:", newEntry);
-        console.log("Collected Data:", collectedData);
     });
 
     // --- Save CSV Button Handler ---
@@ -167,41 +202,40 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Define CSV header
-        let csvContent = "PlotNumber,DBH,Species,Logs\n"; // Updated CSV Header
-
-        // Add each data entry as a row
+        let csvContent = "PlotNumber,DBH,Species,Logs,Cut\n";
         collectedData.forEach(entry => {
-            csvContent += `${entry.plotNumber},${entry.dbh},${entry.species},${entry.logs}\n`;
+            csvContent += `${entry.plotNumber},${entry.dbh},${entry.species},${entry.logs},${entry.cutStatus}\n`;
         });
 
-        // Create a Blob and download link
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-
-        // Generate timestamp for filename
         const timestamp = new Date().toISOString().slice(0, 19).replace(/[-T:]/g, "");
         link.setAttribute("href", url);
         link.setAttribute("download", `TreeData_${timestamp}.csv`);
         link.style.visibility = 'hidden';
-
-        // Trigger download
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(url); // Clean up URL object
+        URL.revokeObjectURL(url);
+
+        // --- Clear temporary data after successful save ---
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+            console.log('[Session] CSV saved. Cleared localStorage.');
+        } catch (e) {
+            console.error('[Session] Error clearing localStorage after save:', e);
+        }
     });
 
     // --- Delete Button Handler ---
     deleteBtn.addEventListener('click', () => {
         const checkboxes = entriesList.querySelectorAll('input[type="checkbox"]:checked');
-        const idsToDelete = new Set(); // Use a Set for efficient lookup
+        const idsToDelete = new Set();
 
         checkboxes.forEach(cb => {
-            // Get the ID stored in the data-id attribute
             const id = parseInt(cb.getAttribute('data-id'), 10);
-            if (!isNaN(id)) { // Ensure it's a valid number
+            if (!isNaN(id)) {
                  idsToDelete.add(id);
             }
         });
@@ -211,30 +245,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Filter out the entries whose IDs are in the Set
         collectedData = collectedData.filter(entry => !idsToDelete.has(entry.id));
-        renderEntries(); // Update the list display
+        renderEntries();
+        saveSessionData(); // <-- Save data after deleting
 
         console.log("Entries deleted. Remaining data:", collectedData);
     });
 
      // --- Enable/Disable Delete Button Based on Checkbox Clicks ---
-     // Use event delegation on the list itself for efficiency
      entriesList.addEventListener('change', (event) => {
-         // Check if the changed element was a checkbox
          if (event.target.type === 'checkbox') {
-             // Enable delete button only if at least one checkbox is checked
              deleteBtn.disabled = !isAnyCheckboxChecked();
          }
      });
 
     // --- Initial Setup ---
-    // Populate dropdowns when the DOM is ready
     populatePlotNumberOptions();
     populateDbhOptions();
     populateLogsOptions();
-    // Render the initial state of the entries list (likely empty)
-    renderEntries();
+
+    // --- Load session data and render ---
+    loadAndPromptSessionData(); // <-- Check for saved data *before* initial render
+
+    // Optional: Add a fallback save just before the page unloads
+    // Note: This is less reliable than saving on action, especially on mobile.
+    // window.addEventListener('beforeunload', saveSessionData);
+
 });
 
 // --- END OF FILE script.js ---
