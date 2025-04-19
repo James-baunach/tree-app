@@ -1,4 +1,4 @@
-/* --- START OF FILE style.css (Condensed Version - Absolute Position Button) --- */
+/* --- START OF FILE style.css --- */
 
 body {
     font-family: sans-serif;
@@ -16,60 +16,120 @@ h1 {
     font-size: 1.6em;
 }
 
-/* Generic h2 styles removed, specific below */
-
-.input-section, .button-section, .output-section {
+/* Sections for main entry view */
+#entryView .input-section,
+#entryView .button-section,
+#entryView .output-section {
     background-color: #fff;
-    padding: 15px; /* Base padding */
+    padding: 15px;
     margin-bottom: 10px;
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Add relative positioning and right padding to output section */
-.output-section {
-    position: relative; /* Needed for absolute positioning of button */
-    /* Add extra padding on the right ONLY to make space for the button */
-    padding-right: 110px; /* Adjust this value based on button width + desired gap */
+#entryView .output-section {
+    position: relative;
+    padding-right: 110px; /* Space for delete button */
+    min-height: 100px;
 }
 
-.input-group {
-    margin-bottom: 8px;
+#entryView .input-group {
+    margin-bottom: 12px;
 }
 
 label {
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     font-weight: bold;
     color: #555;
     font-size: 0.95em;
 }
 
-select {
+label.inline-label {
+    display: inline-block;
+    margin-bottom: 0;
+    margin-right: 5px;
+    font-weight: normal;
+}
+
+select, textarea {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 1em;
+    font-family: inherit;
 }
 
-/* Style for the checkbox group */
+textarea {
+    resize: vertical;
+    min-height: 40px;
+}
+
+/* Condensed Input Row Styles */
+.input-row-condensed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+}
+
+/* Plot Number Counter Styles */
+.plot-counter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.plot-counter-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2em;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+.plot-counter-btn:hover { background-color: #5a6268; }
+.plot-counter-btn:disabled { background-color: #cccccc; cursor: not-allowed; opacity: 0.7; }
+
+#plotNumberDisplay {
+    font-size: 1.1em;
+    font-weight: bold;
+    min-width: 25px;
+    text-align: center;
+    padding: 5px 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    margin: 0;
+}
+
+/* Cut Checkbox Styles */
 .cut-checkbox-group {
     display: flex;
     align-items: center;
-    margin-top: 5px;
-    padding-top: 5px;
+    margin: 0;
 }
-
 .cut-checkbox-group input[type="checkbox"] {
-    margin-right: 8px;
+    margin-right: 6px;
     width: auto;
     height: auto;
     box-sizing: content-box;
-    transform: scale(1.1);
+    transform: scale(1.2);
+    cursor: pointer;
+    flex-shrink: 0;
 }
-
 .cut-checkbox-group label {
     margin-bottom: 0;
     font-weight: normal;
@@ -77,11 +137,51 @@ select {
     flex-basis: auto;
     flex-grow: 0;
     font-size: 1em;
+    color: #333;
+    cursor: pointer;
 }
 
+/* Location Group Styles */
+.location-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-grow: 1;
+    min-width: 150px;
+}
+#getLocationBtn {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 6px 10px;
+    font-size: 0.9em;
+}
+#locationStatus {
+    font-size: 0.85em;
+    color: #555;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    background-color: #f8f9fa;
+    padding: 4px 6px;
+    border-radius: 3px;
+    border: 1px solid #eee;
+}
+
+/* Button Section */
 .button-section {
     text-align: center;
     padding: 10px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    /* Ensure background if outside main sections */
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
 }
 
 button {
@@ -92,83 +192,76 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.95em;
-    margin: 4px;
     transition: background-color 0.2s ease;
     vertical-align: middle;
 }
+button:hover { background-color: #0056b3; }
+button:disabled { background-color: #cccccc; cursor: not-allowed; }
 
-button:hover {
-    background-color: #0056b3;
-}
+#shareBtn { background-color: #17a2b8; }
+#shareBtn:hover { background-color: #117a8b; }
+#shareBtn:disabled { background-color: #a1d1d9; }
 
-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
+#viewTallyBtn { background-color: #ffc107; color: #333; } /* Yellow for Tally */
+#viewTallyBtn:hover { background-color: #e0a800; }
+#viewTallyBtn:disabled { background-color: #ffeeba; }
 
-/* --- Output Section Specific Styles --- */
+#backToEntryBtn { background-color: #6c757d; } /* Grey for Back */
+#backToEntryBtn:hover { background-color: #5a6268; }
 
-/* Remove rules for .output-header */
 
-.output-section h2 {
+/* Output Section */
+#entryView .output-section h2 {
     color: #333;
-    text-align: center; /* Center the heading text */
-    margin: 0 0 10px 0; /* Remove top/left/right margin, add bottom */
+    text-align: center;
+    margin: 0 0 10px 0;
     font-size: 1.2em;
-    /* Right padding is now on the parent .output-section */
-    white-space: nowrap; /* Prevent title wrapping */
-    /* Ensure H2 respects parent padding */
+    white-space: nowrap;
     box-sizing: border-box;
 }
 
 .delete-button {
     background-color: #dc3545;
-    position: absolute;      /* Position relative to .output-section */
-    /* Position it near the top-right corner using padding values */
-    top: 15px;              /* Align with top padding of .output-section */
-    right: 15px;             /* Align with right padding of .output-section */
-    margin: 0;               /* Remove default margins */
-    /* Optional: Adjust padding/font size for a potentially smaller button */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    margin: 0;
     padding: 6px 10px;
     font-size: 0.9em;
 }
+.delete-button:hover { background-color: #c82333; }
+.delete-button:disabled { background-color: #e07e87; }
 
-.delete-button:hover {
-    background-color: #c82333;
-}
-
-.delete-button:disabled {
-    background-color: #e07e87;
-}
-
-
-/* --- Entries List Styling --- */
 #entriesList {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 150px;
+    max-height: 400px;
     overflow-y: auto;
     border: 1px solid #eee;
     padding: 5px;
     border-radius: 4px;
 }
-
 #entriesList li {
     background-color: #e9ecef;
     margin-bottom: 5px;
     padding: 8px;
     border-radius: 4px;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Align checkbox with top of text */
     font-size: 0.9em;
+    line-height: 1.4;
 }
-
 #entriesList li input[type="checkbox"] {
     margin-right: 8px;
     flex-shrink: 0;
     transform: scale(1.1);
+    margin-top: 3px; /* Fine-tune vertical alignment */
 }
+#entriesList li .entry-details { flex-grow: 1; }
+#entriesList li .entry-details .detail-label { font-weight: bold; color: #555; }
+#entriesList li .entry-details .detail-value { color: #333; }
+#entriesList li .entry-details > div { margin-bottom: 2px; } /* Tighter spacing */
 
 #noEntriesMsg {
     color: #6c757d;
@@ -181,4 +274,94 @@ button:disabled {
     font-size: 0.9em;
 }
 
-/* --- END OF FILE style.css --- */
+/* Feedback Message */
+.feedback-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.95em;
+    display: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+
+/* --- Tally View Styles --- */
+#tallyView .tally-section {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#tallyView h2 {
+    text-align: center;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+#tallyResults {
+    max-height: 60vh; /* Limit height and allow scrolling */
+    overflow-y: auto;
+    padding: 5px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #f8f9fa; /* Light background for results area */
+}
+
+#tallyResults .tally-species {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #ccc;
+}
+#tallyResults .tally-species:last-child {
+    border-bottom: none; /* Remove border from last species */
+    margin-bottom: 0;
+}
+
+
+#tallyResults h3 { /* Species Name */
+    font-size: 1.15em;
+    color: #0056b3; /* Darker blue */
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+#tallyResults h4 { /* DBH Value */
+    font-size: 1.05em;
+    color: #444;
+    margin-top: 0;
+    margin-bottom: 5px;
+    padding-left: 15px; /* Indent DBH */
+}
+
+#tallyResults .tally-log-item { /* Log + Count */
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 3px;
+    padding-left: 30px; /* Further indent Logs */
+}
+
+#tallyResults .tally-log-item .log-label {
+    font-weight: normal;
+}
+
+#tallyResults .tally-log-item .log-count {
+    font-weight: bold;
+    color: #155724; /* Green for count */
+}
+
+#tallyResults .no-tally-data {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 15px;
+}
