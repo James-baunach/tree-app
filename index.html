@@ -14,6 +14,17 @@
         <h1>Tree Data Collector</h1>
 
         <div class="input-section">
+            <!-- *** MOVED & ADDED: Plot Number Counter Section *** -->
+            <div class="plot-number-section">
+                <label for="plotNumberDisplay" class="plot-number-label">Plot #:</label>
+                <div class="plot-counter-group">
+                    <button type="button" id="plotDecrementBtn" class="plot-counter-btn" title="Decrement Plot Number">-</button>
+                    <span id="plotNumberDisplay" title="Current Plot Number">1</span>
+                    <button type="button" id="plotIncrementBtn" class="plot-counter-btn" title="Increment Plot Number">+</button>
+                </div>
+            </div>
+            <!-- *** END Plot Number Counter Section *** -->
+
             <!-- Species -->
             <div class="input-group">
                 <label for="speciesSelect">Species:</label>
@@ -50,14 +61,9 @@
                 <select id="logsSelect"></select>
             </div>
 
-            <!-- Condensed Row for Plot, Cut, Location -->
+             <!-- Condensed Row for Cut, Location (Plot Removed) -->
             <div class="input-row-condensed">
-                <!-- Plot Number Counter -->
-                <div class="plot-counter-group">
-                    <button type="button" id="plotDecrementBtn" class="plot-counter-btn" title="Decrement Plot Number">-</button>
-                    <span id="plotNumberDisplay" title="Current Plot Number">1</span>
-                    <button type="button" id="plotIncrementBtn" class="plot-counter-btn" title="Increment Plot Number">+</button>
-                </div>
+                 <!-- *** REMOVED Plot Counter Group from here *** -->
                 <!-- Cut Checkbox -->
                 <div class="cut-checkbox-group">
                     <input type="checkbox" id="cutCheckbox" name="cutStatus">
@@ -80,7 +86,6 @@
         <div class="button-section">
             <button id="submitBtn">Submit Entry</button>
             <button id="saveCsvBtn" disabled>Save CSV File</button>
-            <!-- <button id="shareBtn" disabled>Share Data</button>  REMOVED THIS LINE -->
             <button id="viewTallyBtn" disabled>View Tally</button>
         </div>
 
@@ -96,6 +101,13 @@
                 <li id="noEntriesMsg">No data submitted yet.</li>
             </ul>
         </div>
+
+        <!-- *** ADDED: Delete All Button Section *** -->
+        <div class="delete-all-section">
+            <button id="deleteAllBtn" class="delete-all-button" disabled>Delete All Data</button>
+        </div>
+        <!-- *** END Delete All Button Section *** -->
+
     </div> <!-- End of entryView -->
 
     <!-- === Tally View (Initially Hidden) === -->
