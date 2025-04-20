@@ -198,10 +198,6 @@ button {
 button:hover { background-color: #0056b3; }
 button:disabled { background-color: #cccccc; cursor: not-allowed; }
 
-#shareBtn { background-color: #17a2b8; }
-#shareBtn:hover { background-color: #117a8b; }
-#shareBtn:disabled { background-color: #a1d1d9; }
-
 #viewTallyBtn { background-color: #ffc107; color: #333; } /* Yellow for Tally */
 #viewTallyBtn:hover { background-color: #e0a800; }
 #viewTallyBtn:disabled { background-color: #ffeeba; }
